@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Daily News{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="bg-gray-50">
+    {% if current_user %}
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex space-x-8">
+                    <a href="/" class="inline-flex items-center px-1 pt-1 text-gray-900 font-semibold">
+                        Daily News
+                    </a>
+                    <a href="/" class="inline-flex items-center px-1 pt-1 text-gray-700 hover:text-gray-900">
+                        Latest
+                    </a>
+                    <a href="/category/Technology" class="inline-flex items-center px-1 pt-1 text-gray-700 hover:text-gray-900">
+                        Technology
+                    </a>
+                    <a href="/category/Business" class="inline-flex items-center px-1 pt-1 text-gray-700 hover:text-gray-900">
+                        Business
+                    </a>
+                    <a href="/category/Sports" class="inline-flex items-center px-1 pt-1 text-gray-700 hover:text-gray-900">
+                        Sports
+                    </a>
+                    <a href="/category/Health" class="inline-flex items-center px-1 pt-1 text-gray-700 hover:text-gray-900">
+                        Health
+                    </a>
+                    <a href="/bookmarks" class="inline-flex items-center px-1 pt-1 text-gray-700 hover:text-gray-900">
+                        Bookmarks
+                    </a>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-gray-700 mr-4">{{ current_user.email }}</span>
+                    <form method="POST" action="/logout">
+                        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+    
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
