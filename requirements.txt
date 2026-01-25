@@ -2,6 +2,8 @@ fastapi
 uvicorn
 jinja2
 sqlalchemy
+argon2-cffi
+python-multipart
 feedparser
 apscheduler
-python-multipart
+
