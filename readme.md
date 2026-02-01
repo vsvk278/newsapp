@@ -5,10 +5,11 @@ A production-ready daily news application built with Python and FastAPI, designe
 ## Features
 
 - 📰 Automated news fetching from Google News RSS feeds
+- 🎨 AI-generated unique images for each article (DALL-E 3)
 - 🔐 Secure user authentication with email and password
 - 🔖 Bookmark favorite articles
 - 📱 Responsive design
-- 🚀 Free to host and run
+- ⚡ Fast, cached content delivery
 
 ## Tech Stack
 
@@ -87,12 +88,20 @@ news_app/
 pip install -r requirements.txt
 ```
 
-2. **Run the application**:
+2. **Add default image** (optional):
+Place a `default-news.jpg` file in the `static/` folder. Note: This is only used as a visual reference. The application requires OpenAI API for image generation.
+
+3. **Set OpenAI API Key** (REQUIRED):
+```bash
+export OPENAI_API_KEY=YOUR_OPENAI_API_KEY_HERE
+```
+
+4. **Run the application**:
 ```bash
 uvicorn app.main:app --reload
 ```
 
-3. **Access the app**:
+5. **Access the app**:
 Open http://localhost:8000 in your browser
 
 ## Deployment to Render
@@ -102,17 +111,19 @@ Open http://localhost:8000 in your browser
 3. **Configure the service**:
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port 10000`
-4. **Add environment variable** (optional):
-   - `SECRET_KEY`: A secure random string
+4. **Add environment variables**:
+   - `SECRET_KEY`: A secure random string (required)
+   - `OPENAI_API_KEY`: Your OpenAI API key for AI image generation (required)
 
 5. **Deploy**: Render will automatically deploy your app
 
 ## How It Works
 
 1. **News Fetching**: The app fetches news from Google News RSS feeds every 12 hours using APScheduler
-2. **Storage**: Articles are cached in SQLite to avoid fetching on every request
-3. **Authentication**: Users register with email/password, sessions managed via HTTP-only cookies
-4. **Bookmarks**: Users can bookmark articles for later reading
+2. **AI Image Generation**: Articles without RSS images get unique AI-generated images based on headlines using OpenAI DALL-E 3
+3. **Storage**: Articles and generated image URLs are cached in SQLite to avoid refetching
+4. **Authentication**: Users register with email/password, sessions managed via HTTP-only cookies
+5. **Bookmarks**: Users can bookmark articles for later reading
 
 ## Security Features
 
@@ -129,14 +140,21 @@ Open http://localhost:8000 in your browser
 
 ## Cost
 
-**$0** - Completely free to host and run on Render's free tier
+- **Hosting**: $0 (Render free tier)
+- **OpenAI API**: Pay-as-you-go (~$0.20-$1.60 per 12-hour cycle)
+  - Most articles use RSS images (free)
+  - AI generation only for articles without images
+  - See `OPENAI_SETUP.md` for details
 
 ## Notes
 
 - News is fetched automatically on startup and every 12 hours
+- AI images are generated once per article and cached permanently
+- **OpenAI API key required** - see `OPENAI_SETUP.md` for configuration
 - SQLite database file is stored locally on the server
 - No API keys required for Google News RSS feeds
 - Mobile-responsive design using Tailwind CSS
+- Article cards display: Category, Headline, Date, and "Read more" link only
 
 ## License
 

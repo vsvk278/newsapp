@@ -2,8 +2,8 @@ fastapi
 uvicorn
 jinja2
 sqlalchemy
-argon2-cffi
-python-multipart
+passlib[bcrypt]
 feedparser
 apscheduler
-
+python-multipart
+openai
