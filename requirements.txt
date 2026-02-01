@@ -7,3 +7,4 @@ feedparser
 apscheduler
 python-multipart
 openai
+argon2-cffi
