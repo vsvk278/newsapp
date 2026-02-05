@@ -9,3 +9,4 @@ python-multipart
 requests
 beautifulsoup4
 argon2-cffi
+Pillow>=10.0.0
