@@ -3,9 +3,6 @@ import os
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
 DATABASE_URL = "sqlite:///./news_app.db"
 
-# OpenAI API Configuration
-# OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
 RSS_FEEDS = {
     "Technology": "https://news.google.com/rss/search?q=technology&hl=en-US&gl=US&ceid=US:en",
     "Business": "https://news.google.com/rss/search?q=business&hl=en-US&gl=US&ceid=US:en",
@@ -14,3 +11,11 @@ RSS_FEEDS = {
 }
 
 FETCH_INTERVAL_HOURS = 12
+
+# Category fallback images
+CATEGORY_FALLBACKS = {
+    "Technology": "/static/fallback-technology.jpg",
+    "Business": "/static/fallback-business.jpg",
+    "Sports": "/static/fallback-sports.jpg",
+    "Health": "/static/fallback-health.jpg"
+}

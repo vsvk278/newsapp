@@ -6,5 +6,6 @@ passlib[bcrypt]
 feedparser
 apscheduler
 python-multipart
-openai
+requests
+beautifulsoup4
 argon2-cffi
