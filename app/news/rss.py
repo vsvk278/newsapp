@@ -4,7 +4,7 @@ import os
 import re
 import requests
 from datetime import datetime
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 from io import BytesIO
 
 from bs4 import BeautifulSoup
@@ -18,9 +18,23 @@ from app.models import Article
 # ---------------- CONFIG ----------------
 
 IMAGE_DIR = "static/article_images"
+
 MIN_SIZE_BYTES = 15 * 1024
 MIN_WIDTH = 400
 MIN_HEIGHT = 250
+
+# Indian publisher allow-list (critical)
+ALLOWED_IMAGE_DOMAINS = [
+    "indiatimes.com",
+    "timesofindia.indiatimes.com",
+    "thehindu.com",
+    "ndtv.com",
+    "indiatoday.in",
+    "livemint.com",
+    "moneycontrol.com",
+    "news18.com",
+    "hindustantimes.com",
+]
 
 os.makedirs(IMAGE_DIR, exist_ok=True)
 
@@ -33,6 +47,14 @@ def strip_html(text: str) -> str:
 
 def hash_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def is_allowed_image_domain(url: str) -> bool:
+    try:
+        host = urlparse(url).hostname or ""
+        return any(domain in host for domain in ALLOWED_IMAGE_DOMAINS)
+    except Exception:
+        return False
 
 
 def download_image(url: str) -> str | None:
@@ -87,24 +109,27 @@ def extract_rss_image(entry):
     return None
 
 
-def extract_publisher_image(url: str) -> str | None:
+def extract_publisher_image(article_url: str) -> str | None:
     try:
-        r = requests.get(url, timeout=10)
+        r = requests.get(article_url, timeout=10)
         if r.status_code != 200:
             return None
 
         soup = BeautifulSoup(r.text, "html.parser")
 
+        # Prefer OG / Twitter images
         for prop in ["og:image", "twitter:image"]:
             tag = soup.find("meta", property=prop) or soup.find(
-                "meta", attrs={"name": prop})
+                "meta", attrs={"name": prop}
+            )
             if tag and tag.get("content"):
-                return urljoin(url, tag["content"])
+                return urljoin(article_url, tag["content"])
 
+        # Fallback to article body images
         for img in soup.select("article img, figure img, main img"):
             src = img.get("src")
             if src:
-                return urljoin(url, src)
+                return urljoin(article_url, src)
 
     except Exception:
         return None
@@ -112,7 +137,7 @@ def extract_publisher_image(url: str) -> str | None:
     return None
 
 
-# ---------------- FALLBACK ----------------
+# ---------------- FALLBACKS ----------------
 
 def deterministic_stock_image(article_url: str) -> str:
     seed = hash_text(article_url)[:12]
@@ -131,58 +156,59 @@ def category_fallback(category: str) -> str:
 # ---------------- RESOLVER ----------------
 
 def resolve_article_image(entry, category: str) -> str:
-    # 1. RSS image
+    # 1️⃣ RSS image (only if Indian domain)
     url = extract_rss_image(entry)
-    if url:
+    if url and is_allowed_image_domain(url):
         local = download_image(url)
         if local:
             return local
 
-    # 2. Publisher image
+    # 2️⃣ Publisher page image (only if Indian domain)
     url = extract_publisher_image(entry.link)
-    if url:
+    if url and is_allowed_image_domain(url):
         local = download_image(url)
         if local:
             return local
 
-    # 3. Deterministic stock image
-    url = deterministic_stock_image(entry.link)
-    local = download_image(url)
+    # 3️⃣ Deterministic stock image (free, stable)
+    stock_url = deterministic_stock_image(entry.link)
+    local = download_image(stock_url)
     if local:
         return local
 
-    # 4. Absolute fallback
+    # 4️⃣ Absolute local fallback
     return category_fallback(category)
 
 
-# ---------------- MAIN ----------------
+# ---------------- MAIN PIPELINE ----------------
 
 def fetch_and_store_news(db: Session):
-    for category, feed_url in RSS_FEEDS.items():
-        feed = feedparser.parse(feed_url)
+    for category, feed_urls in RSS_FEEDS.items():
+        for feed_url in feed_urls:
+            feed = feedparser.parse(feed_url)
 
-        for entry in feed.entries[:10]:
-            if not hasattr(entry, "title") or not hasattr(entry, "link"):
-                continue
+            for entry in feed.entries[:10]:
+                if not hasattr(entry, "title") or not hasattr(entry, "link"):
+                    continue
 
-            if db.query(Article).filter(Article.url == entry.link).first():
-                continue
+                if db.query(Article).filter(Article.url == entry.link).first():
+                    continue
 
-            image_url = resolve_article_image(entry, category)
+                image_url = resolve_article_image(entry, category)
 
-            published_at = datetime.utcnow()
-            if hasattr(entry, "published_parsed") and entry.published_parsed:
-                published_at = datetime(*entry.published_parsed[:6])
+                published_at = datetime.utcnow()
+                if hasattr(entry, "published_parsed") and entry.published_parsed:
+                    published_at = datetime(*entry.published_parsed[:6])
 
-            article = Article(
-                title=strip_html(entry.title),
-                summary=strip_html(entry.get("summary", ""))[:500],
-                url=entry.link,
-                image_url=image_url,
-                category=category,
-                published_at=published_at,
-            )
+                article = Article(
+                    title=strip_html(entry.title),
+                    summary=strip_html(entry.get("summary", ""))[:500],
+                    url=entry.link,
+                    image_url=image_url,
+                    category=category,
+                    published_at=published_at,
+                )
 
-            db.add(article)
+                db.add(article)
 
-        db.commit()
+            db.commit()

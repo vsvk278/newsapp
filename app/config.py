@@ -4,11 +4,25 @@ SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
 DATABASE_URL = "sqlite:///./news_app.db"
 
 RSS_FEEDS = {
-    "Technology": "https://news.google.com/rss/search?q=technology&hl=en-US&gl=US&ceid=US:en",
-    "Business": "https://news.google.com/rss/search?q=business&hl=en-US&gl=US&ceid=US:en",
-    "Sports": "https://news.google.com/rss/search?q=sports&hl=en-US&gl=US&ceid=US:en",
-    "Health": "https://news.google.com/rss/search?q=health&hl=en-US&gl=US&ceid=US:en"
+    "Business": [
+        "https://economictimes.indiatimes.com/rssfeedsdefault.cms",
+        "https://www.moneycontrol.com/rss/latestnews.xml",
+        "https://www.livemint.com/rss/markets"
+    ],
+    "Technology": [
+        "https://www.thehindu.com/sci-tech/technology/feeder/default.rss",
+        "https://www.indiatoday.in/rss/technology"
+    ],
+    "Sports": [
+        "https://sports.ndtv.com/rss/all",
+        "https://www.espncricinfo.com/rss/content/story/feeds/0.xml"
+    ],
+    "Health": [
+        "https://www.thehindu.com/sci-tech/health/feeder/default.rss",
+        "https://www.indiatoday.in/rss/health"
+    ]
 }
+
 
 FETCH_INTERVAL_HOURS = 12
 
