@@ -1,1 +1,23 @@
 .venv
+# Runtime-generated article images
+static/article_images/*
+!static/article_images/.gitkeep
+
+# Ignore everything outside repo
+../*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Database
+news_app.db
+
+# Generated images
+static/article_images/*
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini

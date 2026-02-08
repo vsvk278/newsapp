@@ -37,3 +37,74 @@ button {
     flex-direction: column;
     justify-content: flex-end;
 }
+
+/* ===== Sidebar ===== */
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    background: #111;
+    color: #fff;
+    transform: translateX(-260px);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-nav {
+    padding: 60px 20px;
+    flex-grow: 1;
+}
+
+.sidebar-nav a {
+    display: block;
+    color: #fff;
+    text-decoration: none;
+    margin-bottom: 16px;
+}
+
+.sidebar-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.sidebar-logout {
+    padding: 20px;
+    border-top: 1px solid #333;
+}
+
+/* ===== App push behavior ===== */
+
+.app-wrapper {
+    transition: transform 0.3s ease;
+    min-height: 100vh;
+}
+
+/* When sidebar is open */
+.sidebar-open .sidebar {
+    transform: translateX(0);
+}
+
+.sidebar-open .app-wrapper {
+    transform: translateX(260px);
+}
+
+/* ===== Hamburger ===== */
+
+.hamburger {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    margin-right: 12px;
+}
