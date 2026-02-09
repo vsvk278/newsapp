@@ -32,7 +32,9 @@ button {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%);
+    background: linear-gradient(to bottom,
+            rgba(0, 0, 0, 0.3) 0%,
+            rgba(0, 0, 0, 0.7) 100%);
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -41,46 +43,14 @@ button {
 /* ===== Sidebar ===== */
 
 .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 260px;
-    height: 100vh;
-    background: #111;
-    color: #fff;
-    transform: translateX(-260px);
-    transition: transform 0.3s ease;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
+    background-color: #000000;
 }
 
-.sidebar-nav {
-    padding: 60px 20px;
-    flex-grow: 1;
-}
-
-.sidebar-nav a {
-    display: block;
-    color: #fff;
-    text-decoration: none;
-    margin-bottom: 16px;
-}
-
-.sidebar-close {
-    position: absolute;
-    top: 12px;
-    right: 12px;
+/* Close (X) button */
+#sidebarClose {
+    color: #ffffff;
     background: none;
     border: none;
-    color: #fff;
-    font-size: 24px;
-    cursor: pointer;
-}
-
-.sidebar-logout {
-    padding: 20px;
-    border-top: 1px solid #333;
 }
 
 /* ===== App push behavior ===== */
@@ -90,21 +60,65 @@ button {
     min-height: 100vh;
 }
 
-/* When sidebar is open */
-.sidebar-open .sidebar {
-    transform: translateX(0);
+/* ===== Hamburger icon ===== */
+
+#hamburger {
+    color: #000000;
 }
 
-.sidebar-open .app-wrapper {
-    transform: translateX(260px);
+html.dark #hamburger {
+    color: #ffffff;
 }
 
-/* ===== Hamburger ===== */
+/* ===== Navbar text ===== */
 
-.hamburger {
-    background: none;
-    border: none;
-    font-size: 22px;
-    cursor: pointer;
-    margin-right: 12px;
+nav span {
+    color: #000000;
+}
+
+html.dark nav span {
+    color: #ffffff;
+}
+
+/* ===== Page heading (Latest News) ===== */
+
+main h1 {
+    color: #000000;
+}
+
+html.dark main h1 {
+    color: #ffffff;
+}
+
+/* ===== Dark mode base ===== */
+
+html.dark body {
+    background-color: #000000;
+    color: #e5e7eb;
+}
+
+html.dark nav {
+    background-color: #000000;
+}
+
+html.dark main {
+    color: #e5e7eb;
+}
+
+/* =====================================================
+   AUTH PAGE HEADING — FORCE COLOR + OPACITY (FINAL)
+   ===================================================== */
+
+/* Light mode */
+form h1,
+form h2 {
+    color: #000000 !important;
+    opacity: 1 !important;
+}
+
+/* Dark mode */
+html.dark form h1,
+html.dark form h2 {
+    color: #000000 !important;
+    opacity: 1 !important;
 }

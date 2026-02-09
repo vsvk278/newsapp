@@ -23,7 +23,6 @@ MIN_SIZE_BYTES = 15 * 1024
 MIN_WIDTH = 400
 MIN_HEIGHT = 250
 
-# Indian publisher allow-list (critical)
 ALLOWED_IMAGE_DOMAINS = [
     "indiatimes.com",
     "timesofindia.indiatimes.com",
@@ -57,6 +56,8 @@ def is_allowed_image_domain(url: str) -> bool:
         return False
 
 
+# ---------------- IMAGE DOWNLOAD (FIXED) ----------------
+
 def download_image(url: str) -> str | None:
     try:
         r = requests.get(url, timeout=10)
@@ -76,14 +77,26 @@ def download_image(url: str) -> str | None:
             return None
 
         ext = img.format.lower()
+        if ext not in ("jpeg", "jpg", "png"):
+            return None
+
         filename = f"{hash_text(url)}.{ext}"
         path = os.path.join(IMAGE_DIR, filename)
 
+        # ALWAYS write (prevents race conditions)
+        with open(path, "wb") as f:
+            f.write(r.content)
+
+        # CRITICAL: verify file exists and is valid
         if not os.path.exists(path):
-            with open(path, "wb") as f:
-                f.write(r.content)
+            return None
+
+        if os.path.getsize(path) < MIN_SIZE_BYTES:
+            os.remove(path)
+            return None
 
         return f"/{path.replace(os.sep, '/')}"
+
     except Exception:
         return None
 
@@ -117,7 +130,6 @@ def extract_publisher_image(article_url: str) -> str | None:
 
         soup = BeautifulSoup(r.text, "html.parser")
 
-        # Prefer OG / Twitter images
         for prop in ["og:image", "twitter:image"]:
             tag = soup.find("meta", property=prop) or soup.find(
                 "meta", attrs={"name": prop}
@@ -125,7 +137,6 @@ def extract_publisher_image(article_url: str) -> str | None:
             if tag and tag.get("content"):
                 return urljoin(article_url, tag["content"])
 
-        # Fallback to article body images
         for img in soup.select("article img, figure img, main img"):
             src = img.get("src")
             if src:
@@ -156,27 +167,23 @@ def category_fallback(category: str) -> str:
 # ---------------- RESOLVER ----------------
 
 def resolve_article_image(entry, category: str) -> str:
-    # 1️⃣ RSS image (only if Indian domain)
     url = extract_rss_image(entry)
     if url and is_allowed_image_domain(url):
         local = download_image(url)
         if local:
             return local
 
-    # 2️⃣ Publisher page image (only if Indian domain)
     url = extract_publisher_image(entry.link)
     if url and is_allowed_image_domain(url):
         local = download_image(url)
         if local:
             return local
 
-    # 3️⃣ Deterministic stock image (free, stable)
     stock_url = deterministic_stock_image(entry.link)
     local = download_image(stock_url)
     if local:
         return local
 
-    # 4️⃣ Absolute local fallback
     return category_fallback(category)
 
 
