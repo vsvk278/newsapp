@@ -127,16 +127,16 @@ html.dark form h2 {
 
 .sidebar {
     position: fixed;
-    /* stays in place */
+    /* stays fixed on screen */
     top: 0;
     left: 0;
-    height: 100vh;
     width: 260px;
+    height: 100vh;
+
     background-color: #000000;
     /* pure black */
     z-index: 1000;
 
-    overflow-y: auto;
-    /* sidebar scrolls internally if needed */
-    overflow-x: hidden;
+    overflow: hidden;
+    /* NO scrolling at all */
 }
