@@ -122,3 +122,21 @@ html.dark form h2 {
     color: #000000 !important;
     opacity: 1 !important;
 }
+
+/* ===== FIXED HAMBURGER SIDEBAR ===== */
+
+.sidebar {
+    position: fixed;
+    /* stays in place */
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 260px;
+    background-color: #000000;
+    /* pure black */
+    z-index: 1000;
+
+    overflow-y: auto;
+    /* sidebar scrolls internally if needed */
+    overflow-x: hidden;
+}
